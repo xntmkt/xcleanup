@@ -1,0 +1,140 @@
+<?php
+/**
+ * Copyright (c) 2026 xNetVN Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Website: https://xnetvn.com/
+ * Contact: license@xnetvn.net
+ */
+
+declare(strict_types=1);
+
+return [
+    // The absolute path used to check disk usage and free space.
+    'disk_check_path' => '/',
+
+    'paths' => [
+        // Paths allowed for cleanup. Each entry can be:
+        // - An absolute path (file or directory).
+        // - A regular expression (e.g. '#^/var/log/old#').
+        // At least one absolute path is required to define scan roots.
+        'allowed_paths' => [
+            '/tmp',
+            '/var/log',
+            '#^/home/.*/Downloads#',
+        ],
+
+        // Paths to exclude from cleanup. Each entry can be:
+        // - An absolute path (file or directory).
+        // - A regular expression (e.g. '#/important/#').
+        'excluded_paths' => [
+            '/var/log/xcleanup',
+            '#^/var/log/secure#',
+        ],
+
+        // Whether to follow symbolic links during scan.
+        'follow_symlinks' => false,
+    ],
+
+    'cleanup' => [
+        // Minimum age in seconds before an item can be deleted.
+        // Items newer than this threshold are skipped.
+        'min_age_seconds' => 86400,
+
+        // Skip items if they were deleted recently within this window (seconds).
+        // This requires state tracking in the log directory.
+        'skip_if_deleted_within_seconds' => 86400,
+
+        // Delete files when true.
+        'delete_files' => true,
+
+        // Delete empty directories when true.
+        'delete_empty_directories' => true,
+
+        // Maximum number of items to delete in a single run. Use 0 for unlimited.
+        'max_items' => 0,
+    ],
+
+    'emergency' => [
+        // Enable emergency cleanup when disk space is below thresholds.
+        'enabled' => true,
+
+        // Trigger emergency cleanup when free space percentage is below this value.
+        'free_percent_threshold' => 5,
+
+        // Trigger emergency cleanup when free bytes are below this value (5 GB).
+        'free_bytes_threshold' => 5 * 1024 * 1024 * 1024,
+
+        // Trigger emergency cleanup when free bytes are below this critical value (500 MB).
+        'free_bytes_critical_threshold' => 500 * 1024 * 1024,
+
+        // Paths to clean immediately in emergency mode.
+        // Each entry can be an absolute path or a regular expression.
+        'paths' => [
+            '/var/log',
+            '/tmp',
+            '#^/home/.*/Downloads#',
+        ],
+    ],
+
+    'logging' => [
+        // Log directory for confirmation files, reports, and state tracking.
+        'directory' => '/var/log/xcleanup',
+
+        // Log level for the application logger.
+        'level' => 'info',
+
+        // Enable JSON formatted log output.
+        'json_logs' => true,
+
+        // File used to store deletion history and avoid repeated deletes.
+        'state_file' => '/var/log/xcleanup/state.json',
+    ],
+
+    'notifications' => [
+        // Master switch for notifications.
+        'enabled' => true,
+
+        // Email notifications via SMTP.
+        'email' => [
+            'enabled' => false,
+            'smtp_host' => getenv('CLEANUP_SMTP_HOST') ?: '',
+            'smtp_port' => (int) (getenv('CLEANUP_SMTP_PORT') ?: 587),
+            'smtp_username' => getenv('CLEANUP_SMTP_USERNAME') ?: '',
+            'smtp_password' => getenv('CLEANUP_SMTP_PASSWORD') ?: '',
+            'smtp_encryption' => getenv('CLEANUP_SMTP_ENCRYPTION') ?: 'tls',
+            'from' => getenv('CLEANUP_EMAIL_FROM') ?: 'cleanup@example.com',
+            'to' => getenv('CLEANUP_EMAIL_TO') ?: 'ops@example.com',
+        ],
+
+        // Telegram notifications via bot token and chat ID.
+        'telegram' => [
+            'enabled' => false,
+            'bot_token' => getenv('CLEANUP_TELEGRAM_BOT_TOKEN') ?: '',
+            'chat_id' => getenv('CLEANUP_TELEGRAM_CHAT_ID') ?: '',
+        ],
+
+        // Slack notifications via incoming webhook.
+        'slack' => [
+            'enabled' => false,
+            'webhook_url' => getenv('CLEANUP_SLACK_WEBHOOK_URL') ?: '',
+        ],
+
+        // Discord notifications via incoming webhook.
+        'discord' => [
+            'enabled' => false,
+            'webhook_url' => getenv('CLEANUP_DISCORD_WEBHOOK_URL') ?: '',
+        ],
+    ],
+];

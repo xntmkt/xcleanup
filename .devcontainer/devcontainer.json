@@ -1,0 +1,43 @@
+{
+    "name": "xNetVN CleanupD - PHP 8.2",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/php:1": {
+            "version": "8.2"
+        },
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    "remoteUser": "vscode",
+    "containerUser": "vscode",
+    "updateRemoteUserUID": true,
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+    "runArgs": [
+        "--env-file",
+        "${localWorkspaceFolder}/.env"
+    ],
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+        "source=cleanupd_vendor,target=/workspaces/${localWorkspaceFolderBasename}/vendor,type=volume",
+        "source=cleanupd_composer_cache,target=/tmp/composer-cache,type=volume"
+    ],
+    "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/scripts/post-create.sh",
+    "postStartCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/scripts/post-start.sh",
+    "postAttachCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/scripts/post-attach.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "github.copilot",
+                "github.copilot-chat",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "redhat.vscode-yaml"
+            ],
+            "settings": {
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode"
+            }
+        }
+    }
+}

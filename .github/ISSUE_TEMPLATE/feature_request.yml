@@ -1,0 +1,41 @@
+name: Feature Request
+description: Suggest a new feature for xcleanup
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you for the suggestion. Please share the business value and requirements."
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature summary
+      description: Brief summary of the requested feature.
+      placeholder: Describe the feature.
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Value
+      description: How does this help operations or users?
+      placeholder: Describe the impact.
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Detailed requirements
+      description: Include input/output and security constraints.
+      placeholder: "Input/Output:\nSecurity constraints:"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Define the test cases or acceptance criteria.
+      placeholder: List the acceptance criteria.
+    validations:
+      required: true

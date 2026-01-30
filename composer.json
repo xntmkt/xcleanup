@@ -1,0 +1,43 @@
+{
+    "name": "xnetvn/xcleanup",
+    "description": "Scheduled cleanup CLI for files and directories.",
+    "type": "project",
+    "license": "Apache-2.0",
+    "require": {
+        "php": "^8.2",
+        "monolog/monolog": "^3.0",
+        "symfony/console": "^7.0",
+        "symfony/http-client": "^7.0",
+        "symfony/mailer": "^7.0",
+        "symfony/mime": "^7.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "phpstan/phpstan": "^1.11",
+        "phpunit/phpunit": "^10.5",
+        "squizlabs/php_codesniffer": "^3.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "XNetVN\\Cleanup\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "XNetVN\\Cleanup\\Tests\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/cleanup"
+    ],
+    "scripts": {
+        "audit": "composer audit",
+        "fix": "php-cs-fixer fix",
+        "lint": "phpcs --standard=phpcs.xml",
+        "stan": "phpstan analyse --level=max src tests",
+        "test": "phpunit --configuration phpunit.xml.dist"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

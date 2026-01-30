@@ -1,0 +1,33 @@
+name: Refactor Request
+description: Request a refactor for xcleanup
+title: "[Refactor]: "
+labels:
+  - refactor
+body:
+  - type: markdown
+    attributes:
+      value: "Please describe the refactor proposal and its impact."
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Which area needs improvement?
+      placeholder: Describe the current issues.
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale
+      description: Explain whether this targets performance, maintainability, or security.
+      placeholder: Provide the rationale.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: List related files or modules.
+      placeholder: "Files/modules affected."
+    validations:
+      required: true
