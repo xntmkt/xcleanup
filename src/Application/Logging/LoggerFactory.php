@@ -57,9 +57,17 @@ final class LoggerFactory
         }
 
         $logger = new Logger('cleanup');
+
+        try {
+            /** @phpstan-ignore-next-line Monolog validates supported level strings at runtime. */
+            $levelValue = Logger::toMonologLevel($level);
+        } catch (\InvalidArgumentException $exception) {
+            throw new FilesystemException(sprintf('Invalid log level: %s', $level), 0, $exception);
+        }
+
         $handler = new StreamHandler(
             rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'cleanup.log',
-            Logger::toMonologLevel($level)
+            $levelValue
         );
 
         if ($jsonLogs) {

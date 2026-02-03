@@ -57,7 +57,7 @@ final class CleanupStateStore
      * @return bool
      *
      * @example
-     *  if ($store->wasDeletedRecently($path, 3600)) { /* ... */ }
+    *  if ($store->wasDeletedRecently($path, 3600)) { // ... }
      */
     public function wasDeletedRecently(string $path, int $windowSeconds): bool
     {

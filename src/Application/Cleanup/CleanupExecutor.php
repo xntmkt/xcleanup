@@ -118,8 +118,8 @@ final class CleanupExecutor
     private function getLastErrorMessage(): string
     {
         $error = error_get_last();
-        if (is_array($error) && isset($error['message'])) {
-            return (string) $error['message'];
+        if (is_array($error)) {
+            return $error['message'];
         }
 
         return 'Unknown filesystem error.';

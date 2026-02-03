@@ -39,7 +39,7 @@ final class FilesystemScanner
      * @return iterable<SplFileInfo>
      *
      * @example
-     *  foreach ($scanner->scan(['/tmp'], false) as $fileInfo) { /* ... */ }
+    *  foreach ($scanner->scan(['/tmp'], false) as $fileInfo) { // ... }
      */
     public function scan(array $rootPaths, bool $followSymlinks): iterable
     {

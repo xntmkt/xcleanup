@@ -75,7 +75,7 @@ final class CleanupPlan
      * @return bool
      *
      * @example
-     *  if ($plan->isEmergency()) { /* ... */ }
+    *  if ($plan->isEmergency()) { // ... }
      */
     public function isEmergency(): bool
     {

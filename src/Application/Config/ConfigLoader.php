@@ -118,7 +118,9 @@ final class ConfigLoader
     /**
      * Validates required keys and type constraints.
      *
-     * @param CleanupConfig $config
+     * @param array<string, mixed> $config
+     *
+     * @phpstan-assert CleanupConfig $config
      *
      * @return void
      *
@@ -138,23 +140,49 @@ final class ConfigLoader
         }
 
         $this->assertNonEmptyString($config, 'disk_check_path');
-        $this->assertAbsolutePath($config['disk_check_path'], 'disk_check_path');
+        if (!is_string($config['disk_check_path'])) {
+            throw new ConfigurationException('Config disk_check_path must be a string.');
+        }
+        $diskCheckPath = $config['disk_check_path'];
+        $this->assertAbsolutePath($diskCheckPath, 'disk_check_path');
 
-        foreach (['paths', 'cleanup', 'emergency', 'logging', 'notifications'] as $key) {
-            if (!is_array($config[$key])) {
-                throw new ConfigurationException(sprintf('Config %s must be an array.', $key));
-            }
+        $paths = $config['paths'];
+        $cleanup = $config['cleanup'];
+        $emergency = $config['emergency'];
+        $logging = $config['logging'];
+        $notifications = $config['notifications'];
+
+        if (!is_array($paths)) {
+            throw new ConfigurationException('Config paths must be an array.');
+        }
+        if (!is_array($cleanup)) {
+            throw new ConfigurationException('Config cleanup must be an array.');
+        }
+        if (!is_array($emergency)) {
+            throw new ConfigurationException('Config emergency must be an array.');
+        }
+        if (!is_array($logging)) {
+            throw new ConfigurationException('Config logging must be an array.');
+        }
+        if (!is_array($notifications)) {
+            throw new ConfigurationException('Config notifications must be an array.');
         }
 
-        $this->assertPathsConfig($config['paths']);
-        $this->assertCleanupConfig($config['cleanup']);
-        $this->assertEmergencyConfig($config['emergency']);
-        $this->assertLoggingConfig($config['logging']);
-        $this->assertNotificationsConfig($config['notifications']);
+        /** @var array<string, mixed> $paths */
+        /** @var array<string, mixed> $cleanup */
+        /** @var array<string, mixed> $emergency */
+        /** @var array<string, mixed> $logging */
+        /** @var array<string, mixed> $notifications */
+
+        $this->assertPathsConfig($paths);
+        $this->assertCleanupConfig($cleanup);
+        $this->assertEmergencyConfig($emergency);
+        $this->assertLoggingConfig($logging);
+        $this->assertNotificationsConfig($notifications);
     }
 
     /**
-     * @param PathsConfig $paths
+     * @param array<string, mixed> $paths
      *
      * @return void
      */
@@ -164,12 +192,21 @@ final class ConfigLoader
         $this->assertStringArray($paths, 'excluded_paths', false);
         $this->assertBool($paths, 'follow_symlinks');
 
-        $this->assertValidPatterns($paths['allowed_paths'], 'paths.allowed_paths');
-        $this->assertValidPatterns($paths['excluded_paths'], 'paths.excluded_paths');
+        if (!is_array($paths['allowed_paths']) || !is_array($paths['excluded_paths'])) {
+            throw new ConfigurationException('Paths configuration is invalid.');
+        }
+
+        /** @var string[] $allowedPatterns */
+        $allowedPatterns = $paths['allowed_paths'];
+        /** @var string[] $excludedPatterns */
+        $excludedPatterns = $paths['excluded_paths'];
+
+        $this->assertValidPatterns($allowedPatterns, 'paths.allowed_paths');
+        $this->assertValidPatterns($excludedPatterns, 'paths.excluded_paths');
     }
 
     /**
-     * @param CleanupConfig['cleanup'] $cleanup
+     * @param array<string, mixed> $cleanup
      *
      * @return void
      */
@@ -183,7 +220,7 @@ final class ConfigLoader
     }
 
     /**
-     * @param CleanupConfig['emergency'] $emergency
+     * @param array<string, mixed> $emergency
      *
      * @return void
      */
@@ -194,26 +231,39 @@ final class ConfigLoader
         $this->assertNonNegativeInt($emergency, 'free_bytes_threshold');
         $this->assertNonNegativeInt($emergency, 'free_bytes_critical_threshold');
         $this->assertStringArray($emergency, 'paths', false);
-        $this->assertValidPatterns($emergency['paths'], 'emergency.paths');
+
+        if (!is_array($emergency['paths'])) {
+            throw new ConfigurationException('Emergency paths must be an array.');
+        }
+
+        /** @var string[] $emergencyPaths */
+        $emergencyPaths = $emergency['paths'];
+        $this->assertValidPatterns($emergencyPaths, 'emergency.paths');
     }
 
     /**
-     * @param CleanupConfig['logging'] $logging
+     * @param array<string, mixed> $logging
      *
      * @return void
      */
     private function assertLoggingConfig(array $logging): void
     {
         $this->assertNonEmptyString($logging, 'directory');
+        if (!is_string($logging['directory'])) {
+            throw new ConfigurationException('Logging directory must be a string.');
+        }
         $this->assertAbsolutePath($logging['directory'], 'logging.directory');
         $this->assertNonEmptyString($logging, 'level');
         $this->assertBool($logging, 'json_logs');
         $this->assertNonEmptyString($logging, 'state_file');
+        if (!is_string($logging['state_file'])) {
+            throw new ConfigurationException('Logging state_file must be a string.');
+        }
         $this->assertAbsolutePath($logging['state_file'], 'logging.state_file');
     }
 
     /**
-     * @param CleanupConfig['notifications'] $notifications
+     * @param array<string, mixed> $notifications
      *
      * @return void
      */
@@ -225,14 +275,32 @@ final class ConfigLoader
         $this->assertArray($notifications, 'slack');
         $this->assertArray($notifications, 'discord');
 
-        $this->assertEmailConfig($notifications['email']);
-        $this->assertTelegramConfig($notifications['telegram']);
-        $this->assertSlackConfig($notifications['slack']);
-        $this->assertDiscordConfig($notifications['discord']);
+        if (
+            !is_array($notifications['email'])
+            || !is_array($notifications['telegram'])
+            || !is_array($notifications['slack'])
+            || !is_array($notifications['discord'])
+        ) {
+            throw new ConfigurationException('Notifications configuration is invalid.');
+        }
+
+        /** @var array<string, mixed> $email */
+        $email = $notifications['email'];
+        /** @var array<string, mixed> $telegram */
+        $telegram = $notifications['telegram'];
+        /** @var array<string, mixed> $slack */
+        $slack = $notifications['slack'];
+        /** @var array<string, mixed> $discord */
+        $discord = $notifications['discord'];
+
+        $this->assertEmailConfig($email);
+        $this->assertTelegramConfig($telegram);
+        $this->assertSlackConfig($slack);
+        $this->assertDiscordConfig($discord);
     }
 
     /**
-     * @param CleanupConfig['notifications']['email'] $email
+     * @param array<string, mixed> $email
      *
      * @return void
      */
@@ -248,16 +316,27 @@ final class ConfigLoader
         $this->assertString($email, 'to');
 
         if ((bool) $email['enabled']) {
-            foreach (['smtp_host', 'smtp_username', 'smtp_password', 'smtp_encryption', 'from', 'to'] as $key) {
+            $requiredKeys = [
+                'smtp_host',
+                'smtp_username',
+                'smtp_password',
+                'smtp_encryption',
+                'from',
+                'to',
+            ];
+
+            foreach ($requiredKeys as $key) {
                 if ($email[$key] === '') {
-                    throw new ConfigurationException(sprintf('Email notification %s must be a non-empty string.', $key));
+                    throw new ConfigurationException(
+                        sprintf('Email notification %s must be a non-empty string.', $key)
+                    );
                 }
             }
         }
     }
 
     /**
-     * @param CleanupConfig['notifications']['telegram'] $telegram
+     * @param array<string, mixed> $telegram
      *
      * @return void
      */
@@ -273,7 +352,7 @@ final class ConfigLoader
     }
 
     /**
-     * @param CleanupConfig['notifications']['slack'] $slack
+     * @param array<string, mixed> $slack
      *
      * @return void
      */
@@ -288,7 +367,7 @@ final class ConfigLoader
     }
 
     /**
-     * @param CleanupConfig['notifications']['discord'] $discord
+     * @param array<string, mixed> $discord
      *
      * @return void
      */

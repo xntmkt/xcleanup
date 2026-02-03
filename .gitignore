@@ -13,3 +13,8 @@ config/config.php
 .php_cs.cache
 .idea/
 .vscode/
+.github/skills/
+docs/vi/
+xcleanup.code-workspace
+.github/agents
+.github/skills

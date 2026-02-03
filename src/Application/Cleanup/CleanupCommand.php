@@ -43,10 +43,61 @@ use XNetVN\Cleanup\Application\Notification\TelegramNotifier;
 use XNetVN\Cleanup\Application\Util\RandomIdGenerator;
 
 /**
- * @phpstan-import-type CleanupConfig from ConfigLoader
- */
-
-/**
+ * @phpstan-type CleanupConfig array{
+ *     disk_check_path: string,
+ *     paths: array{
+ *         allowed_paths: string[],
+ *         excluded_paths: string[],
+ *         follow_symlinks: bool
+ *     },
+ *     cleanup: array{
+ *         min_age_seconds: int,
+ *         skip_if_deleted_within_seconds: int,
+ *         delete_files: bool,
+ *         delete_empty_directories: bool,
+ *         max_items: int
+ *     },
+ *     emergency: array{
+ *         enabled: bool,
+ *         free_percent_threshold: float|int,
+ *         free_bytes_threshold: int,
+ *         free_bytes_critical_threshold: int,
+ *         paths: string[]
+ *     },
+ *     logging: array{
+ *         directory: string,
+ *         level: string,
+ *         json_logs: bool,
+ *         state_file: string
+ *     },
+ *     notifications: array{
+ *         enabled: bool,
+ *         email: array{
+ *             enabled: bool,
+ *             smtp_host: string,
+ *             smtp_port: int,
+ *             smtp_username: string,
+ *             smtp_password: string,
+ *             smtp_encryption: string,
+ *             from: string,
+ *             to: string
+ *         },
+ *         telegram: array{
+ *             enabled: bool,
+ *             bot_token: string,
+ *             chat_id: string
+ *         },
+ *         slack: array{
+ *             enabled: bool,
+ *             webhook_url: string
+ *         },
+ *         discord: array{
+ *             enabled: bool,
+ *             webhook_url: string
+ *         }
+ *     }
+ * }
+ *
  * CLI entrypoint for cleanup operations.
  */
 final class CleanupCommand extends Command
@@ -90,7 +141,7 @@ final class CleanupCommand extends Command
 
         try {
             $config = (new ConfigLoader())->load($configPath);
-            /** @var CleanupConfig $config */
+            /** @phpstan-var CleanupConfig $config */
             $logger = $this->createLogger($config);
 
             $diskUsage = (new DiskUsageReader())->read((string) $config['disk_check_path']);
@@ -163,7 +214,8 @@ final class CleanupCommand extends Command
     }
 
     /**
-     * @param CleanupConfig $config
+    * @param array $config
+    * @phpstan-param CleanupConfig $config
      *
      * @return LoggerInterface
      *
@@ -184,7 +236,8 @@ final class CleanupCommand extends Command
     }
 
     /**
-     * @param CleanupConfig $config
+    * @param array $config
+    * @phpstan-param CleanupConfig $config
      * @param float $freePercent Current free space percentage.
      * @param int $freeBytes Current free space bytes.
      *
@@ -253,7 +306,11 @@ final class CleanupCommand extends Command
 
         while (true) {
             $question = new Question('Enter confirm key or type "exit" to cancel: ');
-            $answer = (string) $helper->ask($input, $output, $question);
+            $answer = $helper->ask($input, $output, $question);
+            if (!is_string($answer)) {
+                $answer = '';
+            }
+            $answer = trim($answer);
 
             if ($answer === 'exit') {
                 return false;
@@ -325,7 +382,8 @@ final class CleanupCommand extends Command
     }
 
     /**
-     * @param CleanupConfig $config
+    * @param array $config
+    * @phpstan-param CleanupConfig $config
      * @param LoggerInterface $logger Logger used for notification errors.
      * @param string $summary Summary report contents.
      * @param string $detailReportPath Path to detail report.
@@ -363,7 +421,8 @@ final class CleanupCommand extends Command
     }
 
     /**
-     * @param CleanupConfig $config
+    * @param array $config
+    * @phpstan-param CleanupConfig $config
      * @param LoggerInterface $logger Logger used for enabled-but-incomplete channels.
      *
      * @return NotifierInterface[]
@@ -423,7 +482,17 @@ final class CleanupCommand extends Command
     }
 
     /**
-     * @param CleanupConfig['notifications']['email'] $email
+    * @param array $email
+    * @phpstan-param array{
+    *     enabled: bool,
+    *     smtp_host: string,
+    *     smtp_port: int,
+    *     smtp_username: string,
+    *     smtp_password: string,
+    *     smtp_encryption: string,
+    *     from: string,
+    *     to: string
+    * } $email
      *
      * @return bool True when required SMTP fields are populated.
      *

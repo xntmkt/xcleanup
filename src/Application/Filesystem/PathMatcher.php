@@ -49,7 +49,7 @@ final class PathMatcher
      * @return bool
      *
      * @example
-     *  if ($matcher->isAllowed('/tmp/file')) { /* ... */ }
+    *  if ($matcher->isAllowed('/tmp/file')) { // ... }
      */
     public function isAllowed(string $path): bool
     {
@@ -64,7 +64,7 @@ final class PathMatcher
      * @return bool
      *
      * @example
-     *  if ($matcher->isExcluded('/tmp/keep/file')) { /* ... */ }
+    *  if ($matcher->isExcluded('/tmp/keep/file')) { // ... }
      */
     public function isExcluded(string $path): bool
     {

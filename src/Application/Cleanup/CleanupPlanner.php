@@ -30,9 +30,61 @@ use XNetVN\Cleanup\Application\Filesystem\PathMatcher;
 use XNetVN\Cleanup\Domain\Exception\ConfigurationException;
 
 /**
- * @phpstan-import-type CleanupConfig from ConfigLoader
- */
-/**
+ * @phpstan-type CleanupConfig array{
+ *     disk_check_path: string,
+ *     paths: array{
+ *         allowed_paths: string[],
+ *         excluded_paths: string[],
+ *         follow_symlinks: bool
+ *     },
+ *     cleanup: array{
+ *         min_age_seconds: int,
+ *         skip_if_deleted_within_seconds: int,
+ *         delete_files: bool,
+ *         delete_empty_directories: bool,
+ *         max_items: int
+ *     },
+ *     emergency: array{
+ *         enabled: bool,
+ *         free_percent_threshold: float|int,
+ *         free_bytes_threshold: int,
+ *         free_bytes_critical_threshold: int,
+ *         paths: string[]
+ *     },
+ *     logging: array{
+ *         directory: string,
+ *         level: string,
+ *         json_logs: bool,
+ *         state_file: string
+ *     },
+ *     notifications: array{
+ *         enabled: bool,
+ *         email: array{
+ *             enabled: bool,
+ *             smtp_host: string,
+ *             smtp_port: int,
+ *             smtp_username: string,
+ *             smtp_password: string,
+ *             smtp_encryption: string,
+ *             from: string,
+ *             to: string
+ *         },
+ *         telegram: array{
+ *             enabled: bool,
+ *             bot_token: string,
+ *             chat_id: string
+ *         },
+ *         slack: array{
+ *             enabled: bool,
+ *             webhook_url: string
+ *         },
+ *         discord: array{
+ *             enabled: bool,
+ *             webhook_url: string
+ *         }
+ *     }
+ * }
+ *
  * Builds the cleanup plan by scanning files and applying filters.
  */
 final class CleanupPlanner
@@ -53,7 +105,8 @@ final class CleanupPlanner
     }
 
     /**
-     * @param CleanupConfig $config
+    * @param array $config
+    * @phpstan-param CleanupConfig $config
      * @param DiskUsage $diskUsage Current disk usage snapshot.
      * @param bool $emergency Whether emergency mode is enabled.
      *
@@ -127,8 +180,13 @@ final class CleanupPlanner
     }
 
     /**
+     * Resolves the root scan paths based on allowed patterns and emergency settings.
+     *
      * @param string[] $allowedPatterns
-     * @param CleanupConfig $config
+     * @param bool $emergency
+    * @param array $config
+    * @phpstan-param CleanupConfig $config
+     *
      * @return string[]
      */
     private function resolveRootPaths(array $allowedPatterns, bool $emergency, array $config): array
