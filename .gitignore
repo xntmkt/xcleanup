@@ -18,3 +18,4 @@ docs/vi/
 xcleanup.code-workspace
 .github/agents
 .github/skills
+!.env.example

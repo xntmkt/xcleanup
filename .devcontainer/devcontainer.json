@@ -1,5 +1,5 @@
 {
-    "name": "xcleanup - PHP 8.2",
+    "name": "xcleanup - PHP 8.2 + Composer",
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
     "remoteUser": "vscode",
     "containerUser": "vscode",
@@ -9,11 +9,15 @@
     "mounts": [
         "source=${localWorkspaceFolderBasename}-node-modules,target=/workspaces/${localWorkspaceFolderBasename}/node_modules,type=volume",
         "source=${localWorkspaceFolderBasename}-cache,target=/workspaces/${localWorkspaceFolderBasename}/.cache,type=volume",
+        "source=${localWorkspaceFolderBasename}-vendor,target=/workspaces/${localWorkspaceFolderBasename}/vendor,type=volume",
+        "source=${localWorkspaceFolderBasename}-composer-cache,target=/tmp/composer-cache,type=volume",
         "source=/home/udev/.config/Code/User/prompts,target=/workspaces/${localWorkspaceFolderBasename}/.vscode/prompts,type=bind,readonly",
         "source=/home/udev/.config/Code/User/agents,target=/workspaces/${localWorkspaceFolderBasename}/.github/agents,type=bind,readonly",
         "source=/home/udev/.config/.copilot/skills,target=/workspaces/${localWorkspaceFolderBasename}/.vscode/skills,type=bind,readonly"
     ],
     "features": {
+        "ghcr.io/devcontainers/features/copilot-cli:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {},
         "ghcr.io/devcontainers/features/git:1": {},
         "ghcr.io/devcontainers/features/php:1": {
             "version": "8.2",
@@ -28,6 +32,8 @@
             "extensions": [
                 "github.copilot",
                 "github.copilot-chat",
+                "github.vscode-codeql",
+                "ms-playwright.playwright",
                 "dbaeumer.vscode-eslint",
                 "esbenp.prettier-vscode",
                 "redhat.vscode-yaml",
@@ -39,6 +45,7 @@
             }
         }
     },
-    "postCreateCommand": "composer install",
-    "postStartCommand": "php -v"
+    "postCreateCommand": ".devcontainer/scripts/post-create.sh",
+    "postStartCommand": ".devcontainer/scripts/post-start.sh",
+    "postAttachCommand": ".devcontainer/scripts/post-attach.sh"
 }
